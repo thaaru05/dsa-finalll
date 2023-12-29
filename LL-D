@@ -1,0 +1,160 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define a structure for a node in the doubly linked list
+struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+};
+
+// Function to create a new node with given data
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+    newNode->data = data;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to add a node at the end of the doubly linked list
+void addLast(struct Node** head, int data) {
+    struct Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
+    struct Node* temp = *head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
+    newNode->prev = temp;
+}
+
+// Function to add a node in the middle of the doubly linked list
+void addMiddle(struct Node* prevNode, int data) {
+    if (prevNode == NULL) {
+        printf("Previous node cannot be NULL\n");
+        return;
+    }
+    struct Node* newNode = createNode(data);
+    newNode->prev = prevNode;
+    newNode->next = prevNode->next;
+    if (prevNode->next != NULL) {
+        prevNode->next->prev = newNode;
+    }
+    prevNode->next = newNode;
+}
+
+// Function to remove a node with given data from the doubly linked list
+void removeNode(struct Node** head, int data) {
+    struct Node* temp = *head;
+
+    // Find the node to be deleted
+    while (temp != NULL && temp->data != data) {
+        temp = temp->next;
+    }
+
+    // If the node is not present
+    if (temp == NULL) {
+        printf("Node with data %d not found\n", data);
+        return;
+    }
+
+    // Update the links to remove the node
+    if (temp->prev != NULL) {
+        temp->prev->next = temp->next;
+    } else {
+        *head = temp->next; // Update head if the first node is removed
+    }
+
+    if (temp->next != NULL) {
+        temp->next->prev = temp->prev;
+    }
+
+    // Free the memory of the deleted node
+    free(temp);
+}
+
+// Function to traverse the doubly linked list forward and display
+void traverseForwardAndDisplay(struct Node* head) {
+    printf("Forward Linked List: ");
+    while (head != NULL) {
+        printf("%d <-> ", head->data);
+        head = head->next;
+    }
+    printf("NULL\n");
+}
+
+// Function to traverse the doubly linked list backward and display
+void traverseBackwardAndDisplay(struct Node* tail) {
+    printf("Backward Linked List: NULL ");
+    while (tail != NULL) {
+        printf("<-> %d ", tail->data);
+        tail = tail->prev;
+    }
+    printf("\n");
+}
+
+// Function to display the doubly linked list in both directions
+void displayList(struct Node* head) {
+    traverseForwardAndDisplay(head);
+    traverseBackwardAndDisplay(getTail(head));
+}
+
+// Function to get the tail of the doubly linked list
+struct Node* getTail(struct Node* head) {
+    while (head != NULL && head->next != NULL) {
+        head = head->next;
+    }
+    return head;
+}
+
+// Function to add a node at the beginning of the doubly linked list
+void addFirst(struct Node** head, int data) {
+    struct Node* newNode = createNode(data);
+    newNode->next = *head;
+    if (*head != NULL) {
+        (*head)->prev = newNode;
+    }
+    *head = newNode;
+}
+
+// Example usage
+int main() {
+    // Initialize an empty doubly linked list
+    struct Node* head = NULL;
+
+    // Add nodes at the last
+    addLast(&head, 3);
+    addLast(&head, 7);
+    addLast(&head, 1);
+
+    // Display the doubly linked list
+    displayList(head);
+
+    // Add a node at the first
+    addFirst(&head, 5);
+
+    // Display the doubly linked list
+    displayList(head);
+
+    // Add a node in the middle after the node with data 7
+    addMiddle(head->next, 9);
+
+    // Display the doubly linked list
+    displayList(head);
+
+    // Remove the node with data 7
+    removeNode(&head, 7);
+
+    // Display the doubly linked list
+    displayList(head);
+
+    return 0;
+}
