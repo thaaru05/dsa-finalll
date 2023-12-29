@@ -19,20 +19,83 @@ struct Node* createNode(int data) {
     return newNode;
 }
 
-// Function to insert a new node at the beginning of the linked list
-void insertAtBeginning(struct Node** head, int data) {
+// Function to add a node at the end of the linked list
+void addLast(struct Node** head, int data) {
     struct Node* newNode = createNode(data);
-    newNode->next = *head;
-    *head = newNode;
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
+    struct Node* temp = *head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
 }
 
-// Function to print the linked list
-void printList(struct Node* head) {
+// Function to add a node in the middle of the linked list
+void addMiddle(struct Node* prevNode, int data) {
+    if (prevNode == NULL) {
+        printf("Previous node cannot be NULL\n");
+        return;
+    }
+    struct Node* newNode = createNode(data);
+    newNode->next = prevNode->next;
+    prevNode->next = newNode;
+}
+
+// Function to remove a node with given data from the linked list
+void removeNode(struct Node** head, int data) {
+    struct Node* temp = *head;
+    struct Node* prev = NULL;
+
+    // If the node to be deleted is the head
+    if (temp != NULL && temp->data == data) {
+        *head = temp->next;
+        free(temp);
+        return;
+    }
+
+    // Search for the node to be deleted
+    while (temp != NULL && temp->data != data) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    // If the node is not present
+    if (temp == NULL) {
+        printf("Node with data %d not found\n", data);
+        return;
+    }
+
+    // Unlink the node from the linked list
+    prev->next = temp->next;
+
+    // Free the memory of the deleted node
+    free(temp);
+}
+
+// Function to traverse the linked list and perform some operation on each node
+void traverseAndDisplay(struct Node* head) {
     while (head != NULL) {
         printf("%d -> ", head->data);
+        // You can perform some operation on each node here
         head = head->next;
     }
     printf("NULL\n");
+}
+
+// Function to display the linked list
+void displayList(struct Node* head) {
+    printf("Linked List: ");
+    traverseAndDisplay(head);
+}
+
+// Function to add a node at the beginning of the linked list
+void addFirst(struct Node** head, int data) {
+    struct Node* newNode = createNode(data);
+    newNode->next = *head;
+    *head = newNode;
 }
 
 // Example usage
@@ -40,14 +103,31 @@ int main() {
     // Initialize an empty linked list
     struct Node* head = NULL;
 
-    // Insert some nodes at the beginning
-    insertAtBeginning(&head, 3);
-    insertAtBeginning(&head, 7);
-    insertAtBeginning(&head, 1);
+    // Add nodes at the last
+    addLast(&head, 3);
+    addLast(&head, 7);
+    addLast(&head, 1);
 
-    // Print the linked list
-    printf("Linked List: ");
-    printList(head);
+    // Display the linked list
+    displayList(head);
+
+    // Add a node at the first
+    addFirst(&head, 5);
+
+    // Display the linked list
+    displayList(head);
+
+    // Add a node in the middle after the node with data 7
+    addMiddle(head->next, 9);
+
+    // Display the linked list
+    displayList(head);
+
+    // Remove the node with data 7
+    removeNode(&head, 7);
+
+    // Display the linked list
+    displayList(head);
 
     return 0;
 }
